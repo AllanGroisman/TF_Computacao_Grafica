@@ -74,7 +74,9 @@ double rotacaoVeiculo;
 
 //Variaveis do projetil
 Ponto posProjetil;
+double forca = 5;
 boolean atirar = false;
+
 
 
 //Andar e voltar
@@ -213,7 +215,6 @@ void DesenhaCanhao()
     glTranslatef(posVeiculo.x,0,posVeiculo.z);
     glRotatef(rotacaoVeiculo,0,1,0);
 
-
     ///// BASE DO VEICULO
     //desenha
     glPushMatrix();
@@ -245,12 +246,7 @@ void DesenhaCanhao()
     posProjetil = posVeiculo + Ponto (1,0.75,0);
 
     //caso atire, chama funcao que atualiza o posicionamento final do tiro
-    if(atirar){
-        double forca = 5;
-        double distancia = 2 * forca * cos(rotacaoCanhao*3.14/180);
-        Ponto posFinal = Ponto (distancia,0,0);
-        glTranslatef(posFinal.x,posFinal.y,posFinal.z);
-    }
+
     //desenha o projetil
     glColor3f(255, 0, 0);
     glutSolidSphere(0.2, 20, 20);
@@ -260,12 +256,50 @@ void DesenhaCanhao()
     glPopMatrix();
 
 }
-void colisaoParede()
-{
 
+void Tiro()
+{
+    //atirar = false;
+    //forca do tiro
+    //forca = 5;
+    //posicao inicial do projetil
+    //posProjetil;
+    //Angulo
+    //DirecaoCanhao;
+    //calcula o vetor de saida
+    Ponto vetorSaida = Ponto (posProjetil.x,posProjetil.y,posProjetil.z);
+    vetorSaida.soma(DirecaoCanhao.x*forca,0,DirecaoCanhao.z*forca);
+    //calcula a distancia entre o ponto inicial e o final
+    double distancia = 2*forca*cos(rotacaoCanhao*3.14-180);
+    std::cout << "Distancia: " <<distancia << std::endl;
+
+    //Linha
+
+    glPushMatrix();
+        glColor3f(255, 0, 0);
+        //desenha na origem
+        glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
+        glRotated(rotacaoVeiculo,0,1,0);
+        glRotated(rotacaoCanhao,0,0,1);
+        glutSolidTeapot(1);
+        //glutSolidSphere(0.7, 10, 20);
+        //desenha na altura maxima
+        glPushMatrix();
+
+        glPopMatrix();
+
+
+        //desenha no destino
+        glTranslatef(-distancia,0,0);
+        glutSolidTeapot(1);
+        //glutSolidSphere(0.7, 20, 20);
+    glPopMatrix();
+}
+void TestarColisao()
+{
     matrizParede[0][1] = false;
-    int um = 10;
-    int dois = 11;
+    //int um = 10;
+    //int dois = 11;
     for (int i = 9; i < 12; i++) {
         for (int j = 10; j < 13; j++) {
             matrizParede[i][j] = false;
@@ -324,7 +358,6 @@ void DesenhaPiso()
                 DesenhaLadrilho(MediumGoldenrod, PaleGreen);
                 glTranslated(0, 0, 1);
             }
-
         }
         glPopMatrix();
         glTranslated(1, 0, 0);
@@ -482,7 +515,6 @@ void reshape( int w, int h )
 // **********************************************************************
 //  void display( void )
 // **********************************************************************
-float PosicaoZ = -30;
 void display( void )
 {
 
@@ -525,9 +557,10 @@ void display( void )
     movimentarVeiculo();
 
     //Testa se tem colisao com a parede
-    colisaoParede();
-
-
+    if(atirar)
+    {
+        Tiro();
+    }
 	glutSwapBuffers();
 }
 // **********************************************************************
@@ -615,7 +648,7 @@ void keyboard ( unsigned char key, int x, int y )
     //MOVIMENTACAO///////////////////////////////
     //ROTACIONAR
     case '4':
-            DirecaoCanhao.rotacionaY(10);
+           DirecaoCanhao.rotacionaY(10);
             rotacaoVeiculo +=10;
             break;
     case '6':
@@ -639,11 +672,11 @@ void keyboard ( unsigned char key, int x, int y )
             break;
     //MIRAR///////////////////////////////
     case '7':
-            DirecaoCanhao.rotacionaZ(10);
+            //DirecaoCanhao.rotacionaZ(10);
             rotacaoCanhao +=10;
             break;
     case '1':
-            DirecaoCanhao.rotacionaZ(-10);
+            //DirecaoCanhao.rotacionaZ(-10);
             rotacaoCanhao -=10;
             break;
      //ATIRAR///////////////////////////////
@@ -653,6 +686,12 @@ void keyboard ( unsigned char key, int x, int y )
                 break;
             }
             atirar = true;
+            break;
+    case '+':
+            forca++;
+            break;
+    case '-':
+            forca--;
             break;
     //////////////////////////////////////////////
     default:

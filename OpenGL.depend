@@ -526,3 +526,82 @@
 	<sys/time.h>
 	<GLUT/glut.h>
 
+1700702764 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\listadecoresrgb.cpp
+	"ListaDeCoresRGB.h"
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\listadecoresrgb.h
+	<iostream>
+	<cmath>
+	<ctime>
+	<fstream>
+	<windows.h>
+	<glut.h>
+	<sys/time.h>
+	<GLUT/glut.h>
+	<glut.h>
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\gl\glut.h
+	"freeglut.h"
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\gl\freeglut.h
+	"freeglut_std.h"
+	"freeglut_ext.h"
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\gl\freeglut_std.h
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\gl\freeglut_ext.h
+
+1700702764 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\poligono.cpp
+	<iostream>
+	<fstream>
+	"Poligono.h"
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\poligono.h
+	<iostream>
+	<windows.h>
+	<glut.h>
+	<GLUT/glut.h>
+	<glut.h>
+	"Ponto.h"
+	<vector>
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\ponto.h
+	<iostream>
+	<cmath>
+
+1700702764 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\ponto.cpp
+	"Ponto.h"
+
+1700708475 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\programabasico3d.cpp
+	<iostream>
+	<cmath>
+	<ctime>
+	<windows.h>
+	<glut.h>
+	<sys/time.h>
+	<GLUT/glut.h>
+	<glut.h>
+	"Temporizador.h"
+	"ListaDeCoresRGB.h"
+	"Ponto.h"
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\temporizador.h
+	<iostream>
+	<windows.h>
+	<sys/time.h>
+
+1700702764 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\temporizador.cpp
+	"Temporizador.h"
+
+1700702764 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\linha.cpp
+	<cstdlib>
+	"Linha.h"
+
+1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\linha.h
+	<windows.h>
+	<glut.h>
+	<GLUT/glut.h>
+
