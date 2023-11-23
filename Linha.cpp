@@ -7,13 +7,13 @@
 void Linha::geraLinha(int limite, int TamMax)
 {
     float deltaX,deltaY;
-        
+
     x1 = (rand() % limite*10)/10.0;
     y1 = (rand() % limite*10)/10.0;
-    
+
     deltaX = (rand() % limite)/(float)limite;
     deltaY = (rand() % limite)/(float)limite;
-    
+
     if(rand()%2)
         x2 = x1 + deltaX * TamMax;
     else x2 = x1 - deltaX * TamMax;

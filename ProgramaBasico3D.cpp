@@ -33,6 +33,7 @@ using namespace std;
 #include "Temporizador.h"
 #include "ListaDeCoresRGB.h"
 #include "Ponto.h"
+
 Temporizador T;
 double AccumDeltaT=0;
 
@@ -67,13 +68,13 @@ Ponto posOBS = Ponto(0,5,13);
 Ponto posAlvo = Ponto(25,5,13);
 
 //Variaveis do Veículo
-Ponto posVeiculo = Ponto(5,0,13);
+Ponto posVeiculo = Ponto(0,0,0);
+//Rotacoes
 Ponto DirecaoCanhao = Ponto(1,0,0);
 double rotacaoCanhao;
 double rotacaoVeiculo;
 
 //Variaveis do projetil
-Ponto posProjetil;
 double forca = 5;
 boolean atirar = false;
 
@@ -211,6 +212,7 @@ void DesenhaParalelepipedo()
 void DesenhaCanhao()
 {
     glPushMatrix();
+
     //VAI PARA O POSICIONAMENTO DO VEICULO E VIRA PARA ONDE ESTA APONTANDO- universal
     glTranslatef(posVeiculo.x,0,posVeiculo.z);
     glRotatef(rotacaoVeiculo,0,1,0);
@@ -242,16 +244,11 @@ void DesenhaCanhao()
     glPushMatrix();
     //vai na posicao atual do projetil
     glTranslatef(1,0.75,0);
-    //atualiza a posicao do projetil caso queira atirar
-    posProjetil = posVeiculo + Ponto (1,0.75,0);
-
-    //caso atire, chama funcao que atualiza o posicionamento final do tiro
-
     //desenha o projetil
     glColor3f(255, 0, 0);
     glutSolidSphere(0.2, 20, 20);
-
     glPopMatrix();
+
     //FIM DO VEICULO
     glPopMatrix();
 
@@ -259,41 +256,50 @@ void DesenhaCanhao()
 
 void Tiro()
 {
-    //atirar = false;
-    //forca do tiro
-    //forca = 5;
-    //posicao inicial do projetil
-    //posProjetil;
-    //Angulo
-    //DirecaoCanhao;
-    //calcula o vetor de saida
-    Ponto vetorSaida = Ponto (posProjetil.x,posProjetil.y,posProjetil.z);
-    vetorSaida.soma(DirecaoCanhao.x*forca,0,DirecaoCanhao.z*forca);
+    //acha o vetor de direcao do canhao
+    DirecaoCanhao = Ponto(1,0,0);
+
+    //Pega a pos do canhao
+    Ponto posCanhao = Ponto(posVeiculo.x,posVeiculo.y,posVeiculo.z);
+    posCanhao.rotacionaY(rotacaoVeiculo);
+    posCanhao.soma(1,0.75,0);
+    posCanhao.rotacionaZ(rotacaoCanhao);
+
+
+    //calcula o ponto pos direcao de saida
+    Ponto B = Ponto (posCanhao.x,posCanhao.y,posCanhao.z);
+    B.soma(DirecaoCanhao.x*forca,DirecaoCanhao.y*forca,DirecaoCanhao.z*forca);
+
     //calcula a distancia entre o ponto inicial e o final
-    double distancia = 2*forca*cos(rotacaoCanhao*3.14-180);
+    double distancia = 2*forca*cos(rotacaoCanhao*3.14/180);
+
+    //Calcula o ponto final
+    Ponto C = Ponto (posCanhao.x,posCanhao.y,posCanhao.z);
+    C.soma(distancia,0,0);
+    C.rotacionaY(rotacaoVeiculo);
     std::cout << "Distancia: " <<distancia << std::endl;
 
-    //Linha
+    //linha entre A e B
+    glBegin(GL_LINES);
+    glVertex3f(posCanhao.x, posCanhao.y, posCanhao.z);
+    glVertex3f(B.x, B.y, B.z);
+    glEnd();
 
-    glPushMatrix();
-        glColor3f(255, 0, 0);
-        //desenha na origem
-        glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
-        glRotated(rotacaoVeiculo,0,1,0);
-        glRotated(rotacaoCanhao,0,0,1);
-        glutSolidTeapot(1);
-        //glutSolidSphere(0.7, 10, 20);
-        //desenha na altura maxima
-        glPushMatrix();
+    //Linha entre B e C
+    glBegin(GL_LINES);
+    glVertex3f(B.x, B.y, B.z);
+    glVertex3f(C.x, C.y, C.z);
+    glEnd();
 
-        glPopMatrix();
+    //Linha entre A e C
+    glBegin(GL_LINES);
+    glVertex3f(posCanhao.x, posCanhao.y, posCanhao.z);
+    glVertex3f(C.x, C.y, C.z);
+    glEnd();
 
 
-        //desenha no destino
-        glTranslatef(-distancia,0,0);
-        glutSolidTeapot(1);
-        //glutSolidSphere(0.7, 20, 20);
-    glPopMatrix();
+
+
 }
 void TestarColisao()
 {
@@ -388,13 +394,13 @@ void DesenhaParede()
 void movimentarVeiculo()
 {
     double velocidade = 1;
+    Ponto DirecaoVeiculo = Ponto(1,0,0);
+    DirecaoVeiculo.rotacionaY(rotacaoVeiculo);
     if(andar){
-        //Calculo de movimentar
-        posVeiculo.soma(DirecaoCanhao.x*velocidade,DirecaoCanhao.y*velocidade,DirecaoCanhao.z*velocidade);
+        posVeiculo.soma(DirecaoVeiculo.x*velocidade,DirecaoVeiculo.y*velocidade,DirecaoVeiculo.z*velocidade);
     }
     if(voltar){
-        //Calculo de movimentar
-        posVeiculo.soma(-DirecaoCanhao.x*velocidade,-DirecaoCanhao.y*velocidade,-DirecaoCanhao.z*velocidade);
+        posVeiculo.soma(-DirecaoVeiculo.x*velocidade,-DirecaoVeiculo.y*velocidade,-DirecaoVeiculo.z*velocidade);
     }
 }
 
@@ -531,8 +537,7 @@ void display( void )
 		glTranslatef ( 0.0f, 0.0f, 0.0f );
         glRotatef(angulo,0,1,0);
 		glColor3f(0.5f,0.0f,0.0f); // Vermelho
-        glutSolidCube(2);
-        //DesenhaCubo(1);
+        glutSolidCube(0.3);
 	glPopMatrix();
 
     //Cubo 2 - MARCA O MEIO 13-25
@@ -555,7 +560,6 @@ void display( void )
 
     //testa se tem que movimentar o veiculo
     movimentarVeiculo();
-
     //Testa se tem colisao com a parede
     if(atirar)
     {
@@ -648,12 +652,14 @@ void keyboard ( unsigned char key, int x, int y )
     //MOVIMENTACAO///////////////////////////////
     //ROTACIONAR
     case '4':
-           DirecaoCanhao.rotacionaY(10);
             rotacaoVeiculo +=10;
+            DirecaoCanhao.rotacionaY(10);
+            if(rotacaoVeiculo==360){rotacaoVeiculo = 0;}
             break;
     case '6':
+            rotacaoVeiculo += -10;
             DirecaoCanhao.rotacionaY(-10);
-            rotacaoVeiculo -=10;
+            if(rotacaoVeiculo == -10){rotacaoVeiculo +=360;}
             break;
     //ANDAR E VOLTAR
     case '8':
@@ -672,12 +678,14 @@ void keyboard ( unsigned char key, int x, int y )
             break;
     //MIRAR///////////////////////////////
     case '7':
-            //DirecaoCanhao.rotacionaZ(10);
+            if(rotacaoCanhao == 90){break;}
             rotacaoCanhao +=10;
+            DirecaoCanhao.rotacionaZ(10);
             break;
     case '1':
-            //DirecaoCanhao.rotacionaZ(-10);
+            if(rotacaoCanhao == 0){break;}
             rotacaoCanhao -=10;
+            DirecaoCanhao.rotacionaZ(-10);
             break;
      //ATIRAR///////////////////////////////
     case '3':
