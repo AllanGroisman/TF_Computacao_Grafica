@@ -45,7 +45,6 @@ GLfloat AspectRatio, angulo=0;
 // pela tecla 'p'
 int ModoDeProjecao = 1;
 
-
 // Controle do modo de projecao
 // 0: Wireframe; 1: Faces preenchidas
 // A funcao "Init" utiliza esta variavel. O valor dela eh alterado
@@ -56,12 +55,11 @@ int ModoDeExibicao = 1;
 // Parede
 int xParede = 15;
 int zParede = 25;
-bool matrizParede[15][25];
+boolean matrizParede[15][25];
 //Piso
 int xPiso = 50;
 int zPiso = 25;
-bool matrizPiso[50][25];
-
+boolean matrizPiso[50][25];
 
 //Posicao do OBS
 Ponto posOBS = Ponto(0,5,13);
@@ -89,6 +87,7 @@ boolean pessoa3 = false;
 double nFrames=0;
 double TempoTotal=0;
 Ponto CantoEsquerdo = Ponto(-20,-1,-10);
+
 // **********************************************************************
 //  void init(void)
 //        Inicializa os parametros globais de OpenGL
@@ -111,10 +110,18 @@ void init(void)
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    //Ativa e carrega as texturas
-//    CarregarTexturas();
 
-    //inicializarMatrizes();
+    for (int i = 0; i < xParede; i++) {
+        for (int j = 0; j < zParede; j++) {
+            matrizParede[i][j] = true;
+        }
+    }
+    for (int i = 0; i < xPiso; i++) {
+        for (int j = 0; j < zPiso; j++) {
+            matrizParede[i][j] = true;
+        }
+    }
+
 
 }
 // **********************************************************************
@@ -253,7 +260,18 @@ void DesenhaCanhao()
     glPopMatrix();
 
 }
+void colisaoParede()
+{
 
+    matrizParede[0][1] = false;
+    int um = 10;
+    int dois = 11;
+    for (int i = 9; i < 12; i++) {
+        for (int j = 10; j < 13; j++) {
+            matrizParede[i][j] = false;
+        }
+    }
+}
 // **********************************************************************
 // void DesenhaLadrilho(int corBorda, int corDentro)
 // Desenha uma cŽlula do piso.
@@ -302,10 +320,10 @@ void DesenhaPiso()
         glPushMatrix();
         for(int z=0; z<25;z++)
         {
-            //if(matrizPiso[x][z] == true){
+            if(matrizPiso[x][z] == true){
                 DesenhaLadrilho(MediumGoldenrod, PaleGreen);
                 glTranslated(0, 0, 1);
-            //}
+            }
 
         }
         glPopMatrix();
@@ -324,9 +342,9 @@ void DesenhaParede()
         glPushMatrix();
         for(int z=0; z<25;z++)
         {
-            //if(matrizParede[x][z] == true){
+            if(matrizParede[x][z] == true){
                 DesenhaLadrilho(MediumGoldenrod, MediumVioletRed);
-            //}
+            }
             glTranslated(0, 0, 1);
         }
         glPopMatrix();
@@ -500,14 +518,18 @@ void display( void )
     //Desenha a parede
     DesenhaParede();
 
+    //Desenha o canhão
     DesenhaCanhao();
 
+    //testa se tem que movimentar o veiculo
     movimentarVeiculo();
+
+    //Testa se tem colisao com a parede
+    colisaoParede();
+
 
 	glutSwapBuffers();
 }
-
-
 // **********************************************************************
 //  void keyboard ( unsigned char key, int x, int y )
 //
