@@ -63,20 +63,25 @@ int zPiso = 25;
 boolean matrizPiso[50][25];
 
 //Posicao do OBS
-Ponto posOBS = Ponto(0,5,13);
+Ponto posOBS = Ponto(10,5,-10);
 //Posica do alvo
 Ponto posAlvo = Ponto(25,5,13);
 
 //Variaveis do Veículo
-Ponto posVeiculo = Ponto(0,0,0);
+Ponto posVeiculo = Ponto(20,0,0);
 //Rotacoes
-Ponto DirecaoCanhao = Ponto(1,0,0);
 double rotacaoCanhao;
 double rotacaoVeiculo;
 
 //Variaveis do projetil
+Ponto posProjetil = Ponto(0,0,0);
+//cria o vetor de direcao do canhao
+Ponto DirecaoCanhao = Ponto(1,0,0);
 double forca = 5;
-boolean atirar = false;
+boolean miraViva = false;
+boolean tiroVivo = false;
+double velocidadeProjetil = 0.5; //segundos por frame
+double caminhoProjetil = 0;
 
 
 
@@ -230,7 +235,7 @@ void DesenhaCanhao()
     //CANHAO
     glPushMatrix();
     //Acha o Cano em relacao ao canhao
-    glTranslatef(1,0.75,0);
+    glTranslatef(0,0.75,0);
     //Aplica a rotacao de canhao necessaria
     glRotatef(rotacaoCanhao,0,0,1);
     //desenha o cano
@@ -243,7 +248,7 @@ void DesenhaCanhao()
     //PROJETIL
     glPushMatrix();
     //vai na posicao atual do projetil
-    glTranslatef(1,0.75,0);
+    glTranslatef(0,0.75,0);
     //desenha o projetil
     glColor3f(255, 0, 0);
     glutSolidSphere(0.2, 20, 20);
@@ -253,35 +258,71 @@ void DesenhaCanhao()
     glPopMatrix();
 
 }
-
-void Tiro()
+void atirar(Ponto a, Ponto b, Ponto c,double distancia)
 {
-    //acha o vetor de direcao do canhao
-    DirecaoCanhao = Ponto(1,0,0);
+   if(caminhoProjetil<1){
+    //vetor B-A
+    Ponto vetorBA = b;
+    vetorBA.soma((-a.x),(-a.y),(-a.z));
+    posProjetil = a;
+    posProjetil.soma(vetorBA.x*caminhoProjetil,vetorBA.y*caminhoProjetil,vetorBA.z*caminhoProjetil);
+   }
+   else{
+    //vetor B-A
+    Ponto vetorBC = c;
+    vetorBC.soma((-b.x),(-b.y),(-b.z));
 
-    //Pega a pos do canhao
-    Ponto posCanhao = Ponto(posVeiculo.x,posVeiculo.y,posVeiculo.z);
-    posCanhao.rotacionaY(rotacaoVeiculo);
-    posCanhao.soma(1,0.75,0);
-    posCanhao.rotacionaZ(rotacaoCanhao);
+    posProjetil = b;
+    posProjetil.soma(vetorBC.x*(caminhoProjetil-1.0),vetorBC.y*(caminhoProjetil-1.0),vetorBC.z*(caminhoProjetil-1.0));
+   }
 
+    glPushMatrix();
+    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
+    glColor3f(100, 0, 0);
+    glutSolidSphere(0.5, 20, 20);
+    glPopMatrix();
+
+
+    caminhoProjetil += (velocidadeProjetil/distancia);
+
+    if(caminhoProjetil>2){tiroVivo = false;caminhoProjetil=0;}
+    posProjetil.soma(posVeiculo.x,posVeiculo.y,posVeiculo.z);
+
+}
+
+void Mira()
+{
+    //OBTEM OS DADOS INICIAIS DO PROJETIL
+    glPushMatrix();
+    glTranslatef(posVeiculo.x,posVeiculo.y,posVeiculo.z);
+
+    Ponto DirecaoDoCanhao = Ponto(1,0,0);
+    DirecaoDoCanhao.rotacionaZ(rotacaoCanhao);
+    DirecaoDoCanhao.rotacionaY(rotacaoVeiculo);
+
+    Ponto PosicaoDoCanhao = Ponto (0, 0.75, 0);
 
     //calcula o ponto pos direcao de saida
-    Ponto B = Ponto (posCanhao.x,posCanhao.y,posCanhao.z);
-    B.soma(DirecaoCanhao.x*forca,DirecaoCanhao.y*forca,DirecaoCanhao.z*forca);
+    Ponto B = Ponto (PosicaoDoCanhao.x,PosicaoDoCanhao.y,PosicaoDoCanhao.z);
+    B.soma(DirecaoDoCanhao.x*forca,DirecaoDoCanhao.y*forca,DirecaoDoCanhao.z*forca);
 
     //calcula a distancia entre o ponto inicial e o final
     double distancia = 2*forca*cos(rotacaoCanhao*3.14/180);
 
     //Calcula o ponto final
-    Ponto C = Ponto (posCanhao.x,posCanhao.y,posCanhao.z);
+    Ponto C = Ponto (PosicaoDoCanhao.x,PosicaoDoCanhao.y,PosicaoDoCanhao.z);
     C.soma(distancia,0,0);
     C.rotacionaY(rotacaoVeiculo);
-    std::cout << "Distancia: " <<distancia << std::endl;
+    //std::cout << "Distancia: " <<distancia << std::endl;
 
+    if(tiroVivo){
+        atirar(PosicaoDoCanhao,B,C,distancia);
+    }
+
+    //DESENHA A MIRA
     //linha entre A e B
     glBegin(GL_LINES);
-    glVertex3f(posCanhao.x, posCanhao.y, posCanhao.z);
+    glVertex3f(PosicaoDoCanhao.x, PosicaoDoCanhao.y, PosicaoDoCanhao.z);
     glVertex3f(B.x, B.y, B.z);
     glEnd();
 
@@ -293,24 +334,68 @@ void Tiro()
 
     //Linha entre A e C
     glBegin(GL_LINES);
-    glVertex3f(posCanhao.x, posCanhao.y, posCanhao.z);
+    glVertex3f(PosicaoDoCanhao.x, PosicaoDoCanhao.y, PosicaoDoCanhao.z);
     glVertex3f(C.x, C.y, C.z);
     glEnd();
 
 
+    //PROJETIL
+    glPushMatrix();
+    //vai na posicao atual do projetil
+    glTranslatef(PosicaoDoCanhao.x,PosicaoDoCanhao.y,PosicaoDoCanhao.z);
+    //desenha o projetil
+    glColor3f(100, 0, 0);
+    glutSolidSphere(0.5, 20, 20);
+    glPopMatrix();
+
+    //PROJETIL
+    glPushMatrix();
+    //vai na posicao atual do projetil
+    glTranslatef(B.x,B.y,B.z);
+    //desenha o projetil
+    glColor3f(100, 0, 0);
+    glutSolidSphere(0.5, 20, 20);
+    glPopMatrix();
+
+    //PROJETIL
+    glPushMatrix();
+    //vai na posicao atual do projetil
+    glTranslatef(C.x,C.y,C.z);
+    //desenha o projetil
+    glColor3f(100, 0, 0);
+    glutSolidSphere(0.5, 20, 20);
+    glPopMatrix();
+
+
+glPopMatrix();
 
 
 }
 void TestarColisao()
 {
-    matrizParede[0][1] = false;
-    //int um = 10;
-    //int dois = 11;
-    for (int i = 9; i < 12; i++) {
-        for (int j = 10; j < 13; j++) {
+    if(posProjetil.y>15){return;}
+
+    cout << "TEM COLISAO"<< endl;
+
+    //PROJETIL
+    glPushMatrix();
+    //vai na posicao atual do projetil
+    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
+    //desenha o projetil
+    glColor3f(0, 0, 100);
+    glutSolidSphere(0.5, 20, 20);
+    glPopMatrix();
+
+
+    int um = posProjetil.y;
+    int dois = posProjetil.z;
+    for (int i = (um-1); i < (um+2); i++) {
+        for (int j = (dois-1); j < (dois+2); j++) {
             matrizParede[i][j] = false;
         }
     }
+    tiroVivo = false;
+    posProjetil = Ponto(0,0,0);
 }
 // **********************************************************************
 // void DesenhaLadrilho(int corBorda, int corDentro)
@@ -549,6 +634,21 @@ void display( void )
 		//DesenhaCubo(1);
 	glPopMatrix();
 
+
+	//PROJETIL
+    glPushMatrix();
+    //vai na posicao atual do projetil
+    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
+    //desenha o projetil
+    glColor3f(255, 0, 0);
+    glutSolidSphere(1,20, 20);
+    glPopMatrix();
+	//Testa colisao
+	if(posProjetil.x > 24 && posProjetil.x > 26)
+    {
+        TestarColisao();
+    }
+
 	//Chão
     DesenhaPiso();
 
@@ -561,9 +661,9 @@ void display( void )
     //testa se tem que movimentar o veiculo
     movimentarVeiculo();
     //Testa se tem colisao com a parede
-    if(atirar)
+    if(miraViva)
     {
-        Tiro();
+        Mira();
     }
 	glutSwapBuffers();
 }
@@ -653,12 +753,10 @@ void keyboard ( unsigned char key, int x, int y )
     //ROTACIONAR
     case '4':
             rotacaoVeiculo +=10;
-            DirecaoCanhao.rotacionaY(10);
             if(rotacaoVeiculo==360){rotacaoVeiculo = 0;}
             break;
     case '6':
             rotacaoVeiculo += -10;
-            DirecaoCanhao.rotacionaY(-10);
             if(rotacaoVeiculo == -10){rotacaoVeiculo +=360;}
             break;
     //ANDAR E VOLTAR
@@ -680,26 +778,30 @@ void keyboard ( unsigned char key, int x, int y )
     case '7':
             if(rotacaoCanhao == 90){break;}
             rotacaoCanhao +=10;
-            DirecaoCanhao.rotacionaZ(10);
             break;
     case '1':
             if(rotacaoCanhao == 0){break;}
             rotacaoCanhao -=10;
-            DirecaoCanhao.rotacionaZ(-10);
             break;
      //ATIRAR///////////////////////////////
     case '3':
-            if(atirar){
-                atirar = false;
+            if(miraViva){
+                miraViva = false;
                 break;
             }
-            atirar = true;
+            miraViva = true;
             break;
     case '+':
+
             forca++;
             break;
     case '-':
+            if(forca == 0){break;}
             forca--;
+            break;
+    case '*':
+            caminhoProjetil = 0;
+            tiroVivo = true;
             break;
     //////////////////////////////////////////////
     default:
