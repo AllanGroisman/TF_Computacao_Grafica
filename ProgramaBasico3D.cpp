@@ -69,25 +69,27 @@ Ponto posAlvo = Ponto(25,5,13);
 
 //Variaveis do Veículo
 Ponto posVeiculo = Ponto(20,0,0);
+
 //Rotacoes
 double rotacaoCanhao;
 double rotacaoVeiculo;
 
 //Variaveis do projetil
 Ponto posProjetil = Ponto(0,0,0);
+
 //cria o vetor de direcao do canhao
 Ponto DirecaoCanhao = Ponto(1,0,0);
 double forca = 5;
 boolean miraViva = false;
 boolean tiroVivo = false;
-double velocidadeProjetil = 0.5; //segundos por frame
+double velocidadeProjetil = 1; //metros por segundo
 double caminhoProjetil = 0;
-
 
 
 //Andar e voltar
 boolean andar = false;
 boolean voltar = false;
+double velocidade = 2.5;
 //3 pessoa
 boolean pessoa3 = false;
 
@@ -135,6 +137,19 @@ void init(void)
 // **********************************************************************
 //
 // **********************************************************************
+void movimentarVeiculo()
+{
+    double velocidadeReal = velocidade/30;
+    Ponto DirecaoVeiculo = Ponto(1,0,0);
+    DirecaoVeiculo.rotacionaY(rotacaoVeiculo);
+    if(andar){
+        posVeiculo.soma(DirecaoVeiculo.x*velocidadeReal,DirecaoVeiculo.y*velocidadeReal,DirecaoVeiculo.z*velocidadeReal);
+    }
+    if(voltar){
+        posVeiculo.soma(-DirecaoVeiculo.x*velocidadeReal,-DirecaoVeiculo.y*velocidadeReal,-DirecaoVeiculo.z*velocidadeReal);
+    }
+
+}
 void animate()
 {
     double dt;
@@ -148,6 +163,8 @@ void animate()
         AccumDeltaT = 0;
         angulo+= 1;
         glutPostRedisplay();
+        //testa se tem que movimentar o veiculo
+        movimentarVeiculo();
     }
     if (TempoTotal > 5.0)
     {
@@ -258,8 +275,9 @@ void DesenhaCanhao()
     glPopMatrix();
 
 }
-void atirar(Ponto a, Ponto b, Ponto c,double distancia)
+void Atirar(Ponto a, Ponto b, Ponto c,double distancia) //atualiza a posicao do projetil no trajeto
 {
+
    if(caminhoProjetil<1){
     //vetor B-A
     Ponto vetorBA = b;
@@ -279,13 +297,13 @@ void atirar(Ponto a, Ponto b, Ponto c,double distancia)
     glPushMatrix();
     glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
     glColor3f(100, 0, 0);
-    glutSolidSphere(0.5, 20, 20);
+    //glutSolidSphere(0.2, 20, 20);
     glPopMatrix();
 
 
     caminhoProjetil += (velocidadeProjetil/distancia);
 
-    if(caminhoProjetil>2){tiroVivo = false;caminhoProjetil=0;}
+    if(caminhoProjetil>2){tiroVivo = false;caminhoProjetil=0;posProjetil = Ponto(0,0,0);}
     posProjetil.soma(posVeiculo.x,posVeiculo.y,posVeiculo.z);
 
 }
@@ -316,7 +334,8 @@ void Mira()
     //std::cout << "Distancia: " <<distancia << std::endl;
 
     if(tiroVivo){
-        atirar(PosicaoDoCanhao,B,C,distancia);
+        Atirar(PosicaoDoCanhao,B,C,distancia);
+
     }
 
     //DESENHA A MIRA
@@ -345,7 +364,7 @@ void Mira()
     glTranslatef(PosicaoDoCanhao.x,PosicaoDoCanhao.y,PosicaoDoCanhao.z);
     //desenha o projetil
     glColor3f(100, 0, 0);
-    glutSolidSphere(0.5, 20, 20);
+    //glutSolidSphere(0.5, 20, 20);
     glPopMatrix();
 
     //PROJETIL
@@ -354,7 +373,7 @@ void Mira()
     glTranslatef(B.x,B.y,B.z);
     //desenha o projetil
     glColor3f(100, 0, 0);
-    glutSolidSphere(0.5, 20, 20);
+    //glutSolidSphere(0.5, 20, 20);
     glPopMatrix();
 
     //PROJETIL
@@ -363,7 +382,7 @@ void Mira()
     glTranslatef(C.x,C.y,C.z);
     //desenha o projetil
     glColor3f(100, 0, 0);
-    glutSolidSphere(0.5, 20, 20);
+    //glutSolidSphere(0.5, 20, 20);
     glPopMatrix();
 
 
@@ -373,29 +392,33 @@ glPopMatrix();
 }
 void TestarColisao()
 {
-    if(posProjetil.y>15){return;}
+    cout << "TESTANDO COLISAO NO PONTO: "<<posProjetil.x<<", "<<posProjetil.y<<", "<<posProjetil.z<<endl;
 
-    cout << "TEM COLISAO"<< endl;
+    int um = posProjetil.y; // altura = i
+    int dois = posProjetil.z; // largura = j
 
-    //PROJETIL
-    glPushMatrix();
-    //vai na posicao atual do projetil
-    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
-    //desenha o projetil
-    glColor3f(0, 0, 100);
-    glutSolidSphere(0.5, 20, 20);
-    glPopMatrix();
+    if(matrizParede[um][dois] == true){ //se ainda nao foi destruido
+        um = um - 1;
+        dois = dois - 1;
 
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
 
-    int um = posProjetil.y;
-    int dois = posProjetil.z;
-    for (int i = (um-1); i < (um+2); i++) {
-        for (int j = (dois-1); j < (dois+2); j++) {
-            matrizParede[i][j] = false;
+            int linha = um + i;
+            int coluna = dois + j;
+            cout << "Testando: "<<linha<<", "<<coluna<<endl;
+            if(linha > -1 && coluna > -1 && linha <15 && coluna <25){
+                matrizParede[linha][coluna] = false;
+                cout << "QUEBROU QUADRADO: "<<endl;
+            } //mais pra baixo
+            //if(linha > 15){break;}//mais pra cima
+            //if(coluna > 25){break;}//mais pra direita
         }
     }
-    tiroVivo = false;
-    posProjetil = Ponto(0,0,0);
+        tiroVivo = false;
+        posProjetil = Ponto(0,0,0);
+    }
+
 }
 // **********************************************************************
 // void DesenhaLadrilho(int corBorda, int corDentro)
@@ -460,7 +483,7 @@ void DesenhaParede()
     //srand(50); // usa uma semente fixa para gerar sempre as mesma cores no piso
     glPushMatrix();
     glTranslated(25, 0, 0);
-    glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef(90.0f, 0.0f,0.0f, 1.0f);
     for(int x=0; x<15;x++)
     {
         glPushMatrix();
@@ -469,6 +492,12 @@ void DesenhaParede()
             if(matrizParede[x][z] == true){
                 DesenhaLadrilho(MediumGoldenrod, MediumVioletRed);
             }
+            else{
+                glPushMatrix();
+                glColor3f(0, 0, 200);
+                glutSolidSphere(0.1, 20, 20);
+                glPopMatrix();
+            }
             glTranslated(0, 0, 1);
         }
         glPopMatrix();
@@ -476,18 +505,7 @@ void DesenhaParede()
     }
     glPopMatrix();
 }
-void movimentarVeiculo()
-{
-    double velocidade = 1;
-    Ponto DirecaoVeiculo = Ponto(1,0,0);
-    DirecaoVeiculo.rotacionaY(rotacaoVeiculo);
-    if(andar){
-        posVeiculo.soma(DirecaoVeiculo.x*velocidade,DirecaoVeiculo.y*velocidade,DirecaoVeiculo.z*velocidade);
-    }
-    if(voltar){
-        posVeiculo.soma(-DirecaoVeiculo.x*velocidade,-DirecaoVeiculo.y*velocidade,-DirecaoVeiculo.z*velocidade);
-    }
-}
+
 
 
 // **********************************************************************
@@ -634,18 +652,11 @@ void display( void )
 		//DesenhaCubo(1);
 	glPopMatrix();
 
-
-	//PROJETIL
-    glPushMatrix();
-    //vai na posicao atual do projetil
-    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
-    //desenha o projetil
-    glColor3f(255, 0, 0);
-    glutSolidSphere(1,20, 20);
-    glPopMatrix();
-	//Testa colisao
-	if(posProjetil.x > 24 && posProjetil.x > 26)
+	;
+	//Testa colisao contra parede tem que tar na linha 25, e até 15 de altura
+	if(posProjetil.x > 24 && posProjetil.x < 25 && posProjetil.y<15)
     {
+        cout << "TESTANDO COLISAO NO: "<<posProjetil.x<<", "<<posProjetil.y<<", "<<posProjetil.z<<endl;
         TestarColisao();
     }
 
@@ -658,12 +669,20 @@ void display( void )
     //Desenha o canhão
     DesenhaCanhao();
 
-    //testa se tem que movimentar o veiculo
-    movimentarVeiculo();
+
     //Testa se tem colisao com a parede
     if(miraViva)
     {
         Mira();
+         //PROJETIL
+    glPushMatrix();
+    //vai na posicao atual do projetil
+    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
+    //desenha o projetil
+    glColor3f(0, 0, 255);
+    glutSolidSphere(0.2,20, 20);
+    glPopMatrix();
+
     }
 	glutSwapBuffers();
 }
@@ -765,6 +784,7 @@ void keyboard ( unsigned char key, int x, int y )
                 andar = false;
                 break;
             }
+            voltar = false;
             andar = true;
             break;
     case '2':
@@ -772,7 +792,12 @@ void keyboard ( unsigned char key, int x, int y )
                 voltar = false;
                 break;
             }
+            andar = false;
             voltar = true;
+            break;
+    case '5':
+            andar = false;
+            voltar = false;
             break;
     //MIRAR///////////////////////////////
     case '7':
