@@ -283,27 +283,27 @@ void TestarColisao()
         dois = dois - 1;
         Pontuar(0);
 
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
 
-            int linha = um + i;
-            int coluna = dois + j;
-            cout << "Testando: "<<linha<<", "<<coluna<<endl;
-            if(linha > -1 && coluna > -1 && linha <15 && coluna <25){
-                matrizParede[linha][coluna] = false;
-                cout << "QUEBROU QUADRADO: "<<endl;
-                Pontuar(0);
+                int linha = um + i;
+                int coluna = dois + j;
+                cout << "Testando: "<<linha<<", "<<coluna<<endl;
+                if(linha > -1 && coluna > -1 && linha <15 && coluna <25){
+                    matrizParede[linha][coluna] = false;
+                    cout << "QUEBROU QUADRADO: "<<endl;
+                    Pontuar(0);
+                }
             }
         }
-    }
-        tiroVivo = false;
-        posProjetil = Ponto(0,0,0);
+            tiroVivo = false;
+            posProjetil = Ponto(0,0,0);
     }
 
 }
 void movimentarVeiculo()
 {
-    double velocidadeReal = velocidade/25;
+    double velocidadeReal = velocidade/30;
     Ponto DirecaoVeiculo = Ponto(1,0,0);
     DirecaoVeiculo.rotacionaY(rotacaoVeiculo);
     if(andar){
@@ -312,7 +312,6 @@ void movimentarVeiculo()
     if(voltar){
         posVeiculo.soma(-DirecaoVeiculo.x*velocidadeReal,-DirecaoVeiculo.y*velocidadeReal,-DirecaoVeiculo.z*velocidadeReal);
     }
-
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //DESENHAR
@@ -546,13 +545,6 @@ void display( void )
 
 	glMatrixMode(GL_MODELVIEW);
 
-	//Testa colisao contra parede tem que tar na linha 25, e até 15 de altura
-	if(posProjetil.x > 24 && posProjetil.x < 25 && posProjetil.y<15)
-    {
-        cout << "TESTANDO COLISAO NO: "<<posProjetil.x<<", "<<posProjetil.y<<", "<<posProjetil.z<<endl;
-        TestarColisao();
-
-    }
     movimentarVeiculo();
 	//Chão
     DesenhaPiso();
@@ -563,19 +555,30 @@ void display( void )
     //Desenha o canhão
     DesenhaCanhao();
 
-
     //Se a mira ta ativa, imprime a mira e mostra o projetil
     if(miraViva)
     {
-        Mirar();
-        //DESENHA O PROJETIL EM SEU CAMINHO
-        glPushMatrix();
-        glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
-        glColor3f(0, 0, 1);
-        glutSolidSphere(0.2,20, 20);
-        glColor3f(1, 1, 1);
-        glPopMatrix();
 
+        Mirar();
+
+        //DESENHA O PROJETIL EM SEU CAMINHO
+        if(tiroVivo)
+        {
+            glPushMatrix();
+            glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
+            glColor3f(0, 0, 1);
+            glutSolidSphere(0.2,20, 20);
+            glColor3f(1, 1, 1);
+            glPopMatrix();
+        }
+
+        //Testa colisao contra parede tem que tar na linha 25, e até 15 de altura
+        if(posProjetil.x > 24 && posProjetil.x < 25 && posProjetil.y<15)
+        {
+            cout << "TESTANDO COLISAO NO: "<<posProjetil.x<<", "<<posProjetil.y<<", "<<posProjetil.z<<endl;
+            TestarColisao();
+
+        }
         //Testa a propria destruicao
         if(caminhoProjetil>1 &&
            posProjetil.x<(posVeiculo.x+1.5)&&posProjetil.x>(posVeiculo.x-1.5)&&
@@ -586,6 +589,7 @@ void display( void )
             exit(0);
         }
     }
+
 	glutSwapBuffers();
 
 }
