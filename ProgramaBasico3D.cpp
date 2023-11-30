@@ -67,12 +67,11 @@ int zPiso = 25;
 boolean matrizPiso[50][25];
 
 //Posicao do OBS
-Ponto posOBS = Ponto(10,5,-10);
+Ponto posOBS = Ponto(-6,16,13);
 //Posica do alvo
-Ponto posAlvo = Ponto(25,5,13);
-
+Ponto posAlvo = Ponto(25,0,13);
 //Variaveis do VeÌculo
-Ponto posVeiculo = Ponto(20,0,0);
+Ponto posVeiculo = Ponto(10,0,10);
 
 //Rotacoes
 double rotacaoCanhao;
@@ -80,12 +79,12 @@ double rotacaoVeiculo;
 
 //Variaveis do projetil
 Ponto posProjetil = Ponto(0,0,0);
-
-//cria o vetor de direcao do canhao
 Ponto DirecaoCanhao = Ponto(1,0,0);
-double forca = 5;
+
 boolean miraViva = false;
 boolean tiroVivo = false;
+
+double forca = 10;
 double velocidadeProjetil = 1; //metros por segundo
 double caminhoProjetil = 0;
 
@@ -93,30 +92,27 @@ double caminhoProjetil = 0;
 boolean andar = false;
 boolean voltar = false;
 double velocidade = 2.5;
-//3 pessoa
-boolean pessoa3 = false;
+//Altera a visao para fixar no carro
+boolean fixarCarro = false;
 
 //PONTUACAO
 int pontuacao = 0;
 
+//ja existentes
 double nFrames=0;
 double TempoTotal=0;
 Ponto CantoEsquerdo = Ponto(-20,-1,-10);
 
-///////////////////////////////////////TEXTURA
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//INITS
+/////////////////////////////////////////////////////////////////////////////////////////////////
 GLuint textureId[2];
 void initTexture (void)
 {
-    textureId[0] = LoadTexture ("Falcao.jpg");
+    textureId[0] = LoadTexture ("wall.png");
+    textureId[1] = LoadTexture ("grass.png");
 
 }
-
-
-
-// **********************************************************************
-//  void init(void)
-//        Inicializa os parametros globais de OpenGL
-// **********************************************************************
 void init(void)
 {
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f); // Fundo de tela preto
@@ -151,21 +147,9 @@ void init(void)
 
 }
 // **********************************************************************
-//
+//ANIMATE
 // **********************************************************************
-void movimentarVeiculo()
-{
-    double velocidadeReal = velocidade/30;
-    Ponto DirecaoVeiculo = Ponto(1,0,0);
-    DirecaoVeiculo.rotacionaY(rotacaoVeiculo);
-    if(andar){
-        posVeiculo.soma(DirecaoVeiculo.x*velocidadeReal,DirecaoVeiculo.y*velocidadeReal,DirecaoVeiculo.z*velocidadeReal);
-    }
-    if(voltar){
-        posVeiculo.soma(-DirecaoVeiculo.x*velocidadeReal,-DirecaoVeiculo.y*velocidadeReal,-DirecaoVeiculo.z*velocidadeReal);
-    }
 
-}
 void animate()
 {
     double dt;
@@ -180,7 +164,7 @@ void animate()
         angulo+= 1;
         glutPostRedisplay();
         //testa se tem que movimentar o veiculo
-        movimentarVeiculo();
+
     }
     if (TempoTotal > 5.0)
     {
@@ -188,12 +172,17 @@ void animate()
        // cout << "Nros de Frames sem desenho: " << nFrames << endl;
         //cout << "FPS(sem desenho): " << nFrames/TempoTotal << endl;
         cout << "SCORE: " << pontuacao << endl;
+        cout << "OBSERVADOR: "<<posOBS.x<<","<<posOBS.y<<","<<posOBS.z<<endl;
 
         TempoTotal = 0;
         nFrames = 0;
     }
 }
-void Pontuar(int objeto){
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//FUNCOES OUTRAS
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void Pontuar(int objeto)
+{
     if(objeto == 0) // parede
     {
         pontuacao += 5;
@@ -204,52 +193,7 @@ void Pontuar(int objeto){
         cout << "Errou todo mundo: -10" << endl;
     }
 }
-void DesenhaCanhao()
-{
-    glPushMatrix();
-
-    //VAI PARA O POSICIONAMENTO DO VEICULO E VIRA PARA ONDE ESTA APONTANDO- universal
-    glTranslatef(posVeiculo.x,0,posVeiculo.z);
-    glRotatef(rotacaoVeiculo,0,1,0);
-
-    ///// BASE DO VEICULO
-    //desenha
-    glPushMatrix();
-    //Desenha a base
-    glColor3f(1,0,1);
-    glScalef(3,1,2);
-    glutSolidCube(1);
-    glPopMatrix();
-    /////
-
-    //CANHAO
-    glPushMatrix();
-    //Acha o Cano em relacao ao canhao
-    glTranslatef(0,0.75,0);
-    //Aplica a rotacao de canhao necessaria
-    glRotatef(rotacaoCanhao,0,0,1);
-    //desenha o cano
-    glColor3f(0,1,1);
-    glScalef(1,0.5,0.5);
-    glutSolidCube(1);
-    glPopMatrix();
-    /////
-
-    //PROJETIL
-    glPushMatrix();
-    //vai na posicao atual do projetil
-    glTranslatef(0,0.75,0);
-    //desenha o projetil
-    glColor3f(1, 0, 0);
-    glutSolidSphere(0.2, 20, 20);
-    glPopMatrix();
-
-    //FIM DO VEICULO
-    glColor3f(1,1,1);
-    glPopMatrix();
-
-}
-void Atirar(Ponto a, Ponto b, Ponto c) //atualiza a posicao do projetil no trajeto
+void Atirar(Ponto a, Ponto b, Ponto c)
 {
    if(caminhoProjetil<1){
     //vetor B-A
@@ -267,19 +211,14 @@ void Atirar(Ponto a, Ponto b, Ponto c) //atualiza a posicao do projetil no traje
     posProjetil.soma(vetorBC.x*(caminhoProjetil-1.0),vetorBC.y*(caminhoProjetil-1.0),vetorBC.z*(caminhoProjetil-1.0));
 
    }
-
-    caminhoProjetil += (velocidadeProjetil/10);
-
-
-
+    caminhoProjetil += (velocidadeProjetil/15);
 
     if(caminhoProjetil>2.2){tiroVivo = false;caminhoProjetil=0;posProjetil = Ponto(0,0,0);Pontuar(1);}
     posProjetil.soma(posVeiculo.x,posVeiculo.y,posVeiculo.z);
 
 
 }
-
-void Mira()
+void Mirar()
 {
     //OBTEM OS DADOS INICIAIS DO PROJETIL
     glPushMatrix();
@@ -306,7 +245,6 @@ void Mira()
 
     if(tiroVivo){
         Atirar(PosicaoDoCanhao,B,C);
-
     }
 
     //DESENHA A MIRA
@@ -363,12 +301,22 @@ void TestarColisao()
     }
 
 }
-// **********************************************************************
-// void DesenhaLadrilho(int corBorda, int corDentro)
-// Desenha uma célula do piso.
-// Eh possivel definir a cor da borda e do interior do piso
-// O ladrilho tem largula 1, centro no (0,0,0) e está sobre o plano XZ
-// **********************************************************************
+void movimentarVeiculo()
+{
+    double velocidadeReal = velocidade/25;
+    Ponto DirecaoVeiculo = Ponto(1,0,0);
+    DirecaoVeiculo.rotacionaY(rotacaoVeiculo);
+    if(andar){
+        posVeiculo.soma(DirecaoVeiculo.x*velocidadeReal,DirecaoVeiculo.y*velocidadeReal,DirecaoVeiculo.z*velocidadeReal);
+    }
+    if(voltar){
+        posVeiculo.soma(-DirecaoVeiculo.x*velocidadeReal,-DirecaoVeiculo.y*velocidadeReal,-DirecaoVeiculo.z*velocidadeReal);
+    }
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//DESENHAR
+/////////////////////////////////////////////////////////////////////////////////////////////////
 void DesenhaLadrilho(int id)
 {
         glEnable(GL_TEXTURE_2D);
@@ -393,27 +341,19 @@ void DesenhaLadrilho(int id)
         glDisable(GL_TEXTURE_2D);
 
 }
-
-// **********************************************************************
-// TERRENO
-//
-// **********************************************************************
 void DesenhaPiso()
 {
-    //srand(50); // usa uma semente fixa para gerar sempre as mesma cores no piso
     glPushMatrix();
     //Deixa o ch„o um pouco mais para baixo
     glTranslated(0, -0.5, 0);
-    //glTranslated(CantoEsquerdo.x, CantoEsquerdo.y, CantoEsquerdo.z);
+    //percorre a matriz e desenha
     for(int x=0; x<50;x++)
     {
         glPushMatrix();
         for(int z=0; z<25;z++)
         {
-            if(matrizPiso[x][z] == true){
-                DesenhaLadrilho(0);
+                DesenhaLadrilho(1);
                 glTranslated(0, 0, 1);
-            }
         }
         glPopMatrix();
         glTranslated(1, 0, 0);
@@ -448,12 +388,54 @@ void DesenhaParede()
     }
     glPopMatrix();
 }
+void DesenhaCanhao()
+{
+    glPushMatrix();
 
+    //VAI PARA O POSICIONAMENTO DO VEICULO E VIRA PARA ONDE ESTA APONTANDO- universal
+    glTranslatef(posVeiculo.x,0,posVeiculo.z);
+    glRotatef(rotacaoVeiculo,0,1,0);
 
+    ///// BASE DO VEICULO
+    //desenha
+    glPushMatrix();
+    //Desenha a base
+    glColor3f(0.52,0.37,0.26);
+    glScalef(3,1,2);
+    glutSolidCube(1);
+    glPopMatrix();
+    /////
 
-// **********************************************************************
-//  void DefineLuz(void)
-// **********************************************************************
+    //CANHAO
+    glPushMatrix();
+    //Acha o Cano em relacao ao canhao
+    glTranslatef(0,0.75,0);
+    //Aplica a rotacao de canhao necessaria
+    glRotatef(rotacaoCanhao,0,0,1);
+    //desenha o cano
+    glColor3f(0.81,0.71,0.23);
+    glScalef(1,0.5,0.5);
+    glutSolidCube(1);
+    glPopMatrix();
+    /////
+
+    //PROJETIL
+    glPushMatrix();
+    //vai na posicao atual do projetil
+    glTranslatef(0,0.75,0);
+    //desenha o projetil
+    glColor3f(1, 0, 0);
+    glutSolidSphere(0.2, 20, 20);
+    glPopMatrix();
+
+    //FIM DO VEICULO
+    glColor3f(1,1,1);
+    glPopMatrix();
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//FUNCOES PRINCIPAIS
+/////////////////////////////////////////////////////////////////////////////////////////////////
 void DefineLuz(void)
 {
   // Define cores para um objeto dourado
@@ -491,8 +473,6 @@ void DefineLuz(void)
   glMateriali(GL_FRONT,GL_SHININESS,51);
 
 }
-// **********************************************************************
-
 void MygluPerspective(float fieldOfView, float aspect, float zNear, float zFar )
 {
     //https://stackoverflow.com/questions/2417697/gluperspective-was-removed-in-opengl-3-1-any-replacements/2417756#2417756
@@ -506,9 +486,6 @@ void MygluPerspective(float fieldOfView, float aspect, float zNear, float zFar )
     GLfloat fW = fH * aspect;
     glFrustum( -fW, fW, -fH, fH, zNear, zFar );
 }
-// **********************************************************************
-//  void PosicUser()
-// **********************************************************************
 void PosicUser()
 {
 
@@ -527,7 +504,7 @@ void PosicUser()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    if(pessoa3){
+    if(fixarCarro){
         gluLookAt(posOBS.x,posOBS.y,posOBS.z,
                    posVeiculo.x,0,posVeiculo.z,
                    0.0f,1.0f,0.0f);
@@ -540,11 +517,6 @@ void PosicUser()
 
 
 }
-// **********************************************************************
-//  void reshape( int w, int h )
-//		trata o redimensionamento da janela OpenGL
-//
-// **********************************************************************
 void reshape( int w, int h )
 {
 
@@ -563,10 +535,6 @@ void reshape( int w, int h )
 	PosicUser();
 
 }
-
-// **********************************************************************
-//  void display( void )
-// **********************************************************************
 void display( void )
 {
 
@@ -585,7 +553,7 @@ void display( void )
         TestarColisao();
 
     }
-
+    movimentarVeiculo();
 	//Ch„o
     DesenhaPiso();
 
@@ -599,7 +567,7 @@ void display( void )
     //Se a mira ta ativa, imprime a mira e mostra o projetil
     if(miraViva)
     {
-        Mira();
+        Mirar();
         //DESENHA O PROJETIL EM SEU CAMINHO
         glPushMatrix();
         glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
@@ -617,18 +585,10 @@ void display( void )
             cout << "Voce se destruiu"<<endl;
             exit(0);
         }
-
     }
-
-
 	glutSwapBuffers();
 
 }
-// **********************************************************************
-//  void keyboard ( unsigned char key, int x, int y )
-//
-//
-// **********************************************************************
 void keyboard ( unsigned char key, int x, int y )
 {
 	switch ( key )
@@ -699,11 +659,11 @@ void keyboard ( unsigned char key, int x, int y )
 
     //CAMERA//////////////////////////////////////////////
     case '9':
-            if(pessoa3){
-                pessoa3 = false;
+            if(fixarCarro){
+                fixarCarro = false;
                 break;
             }
-            pessoa3 = true;
+            fixarCarro = true;
             break;
 
     //MOVIMENTACAO///////////////////////////////
@@ -767,17 +727,30 @@ void keyboard ( unsigned char key, int x, int y )
             tiroVivo = true;
             break;
     //////////////////////////////////////////////
+     //VISUALIZACOES///////////////////////////////
+    case '!':
+            posOBS = Ponto (-6,16,13);
+            break;
+    case '@':
+            posOBS = Ponto(22,33,13);
+            break;
+    case '#':
+            posOBS = Ponto(4,3,5);
+            break;
+    case '$':
+            posOBS = Ponto(8,9,-1);
+            break;
+    case '%':
+            posOBS = Ponto(20,19,-9);
+            break;
+    case '&':
+            posOBS = Ponto(18,5,5);
+            break;
     default:
             cout << key;
     break;
   }
 }
-
-// **********************************************************************
-//  void arrow_keys ( int a_keys, int x, int y )
-//
-//
-// **********************************************************************
 void arrow_keys ( int a_keys, int x, int y )
 {
 	switch ( a_keys )
@@ -792,13 +765,6 @@ void arrow_keys ( int a_keys, int x, int y )
 			break;
 	}
 }
-
-
-// **********************************************************************
-//  void main ( int argc, char** argv )
-//
-//
-// **********************************************************************
 int main ( int argc, char** argv )
 {
 	glutInit            ( &argc, argv );

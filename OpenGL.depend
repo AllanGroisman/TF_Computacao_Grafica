@@ -575,7 +575,7 @@
 1700702764 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\ponto.cpp
 	"Ponto.h"
 
-1701309349 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\programabasico3d.cpp
+1701315297 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\programabasico3d.cpp
 	<iostream>
 	<cmath>
 	<ctime>
@@ -685,4 +685,14 @@
 
 1559011704 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\textureclass.h
 	"ImageClass.h"
+
+1701284551 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\leitura-basico.cpp
+	<iostream>
+	<cmath>
+	<ctime>
+	<fstream>
+	<windows.h>
+	"gl\glut.h"
+	<sys/time.h>
+	<GLUT/glut.h>
 
