@@ -575,7 +575,7 @@
 1700702764 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\ponto.cpp
 	"Ponto.h"
 
-1701279197 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\programabasico3d.cpp
+1701309349 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\programabasico3d.cpp
 	<iostream>
 	<cmath>
 	<ctime>
@@ -587,6 +587,8 @@
 	"Temporizador.h"
 	"ListaDeCoresRGB.h"
 	"Ponto.h"
+	"SOIL/SOIL.h"
+	"TextureClass.h"
 
 1700702764 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\temporizador.h
 	<iostream>
@@ -604,4 +606,83 @@
 	<windows.h>
 	<glut.h>
 	<GLUT/glut.h>
+
+1215465208 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\image_dxt.cpp
+	"image_DXT.h"
+	<math.h>
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+
+1215465208 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\image_dxt.h
+
+1215465208 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\image_helper.cpp
+	"image_helper.h"
+	<stdlib.h>
+	<math.h>
+
+1215465208 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\image_helper.h
+
+1425993828 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\soil.cpp
+	<windows.h>
+	<wingdi.h>
+	<GL/gl.h>
+	<OpenGL/gl.h>
+	<Carbon/Carbon.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	"SOIL.h"
+	"stb_image_aug.h"
+	"image_helper.h"
+	"image_DXT.h"
+	<stdlib.h>
+	<string.h>
+	<iostream>
+
+1215465208 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\soil.h
+
+1215465208 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\stb_image_aug.h
+	<stdio.h>
+
+1425995044 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\stb_image_aug.cpp
+	"stb_image_aug.h"
+	<math.h>
+	<string.h>
+	<stdio.h>
+	<stdlib.h>
+	<memory.h>
+	<assert.h>
+	<stdarg.h>
+	"stbi_DDS_aug.h"
+	"stbi_DDS_aug_c.h"
+
+1215465208 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\stbi_dds_aug.h
+
+1215465208 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\soil\stbi_dds_aug_c.h
+
+1554980436 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\imageclass.cpp
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<string.h>
+	<windows.h>
+	"gl\glut.h"
+	<GLUT/glut.h>
+	"ImageClass.h"
+
+1554949128 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\imageclass.h
+	<iostream>
+	<cstdlib>
+	<cstring>
+	<windows.h>
+	"gl\glut.h"
+	<GLUT/glut.h>
+	<GL/glut.h>
+	"SOIL/SOIL.h"
+
+1559012174 source:c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\textureclass.cpp
+	"TextureClass.h"
+
+1559011704 c:\users\allan\desktop\puc\3sem\compgrafica\t2_cg\textureclass.h
+	"ImageClass.h"
 

@@ -34,6 +34,10 @@ using namespace std;
 #include "ListaDeCoresRGB.h"
 #include "Ponto.h"
 
+///
+#include "SOIL/SOIL.h"
+#include "TextureClass.h"
+
 Temporizador T;
 double AccumDeltaT=0;
 
@@ -85,7 +89,6 @@ boolean tiroVivo = false;
 double velocidadeProjetil = 1; //metros por segundo
 double caminhoProjetil = 0;
 
-
 //Andar e voltar
 boolean andar = false;
 boolean voltar = false;
@@ -93,10 +96,22 @@ double velocidade = 2.5;
 //3 pessoa
 boolean pessoa3 = false;
 
+//PONTUACAO
+int pontuacao = 0;
 
 double nFrames=0;
 double TempoTotal=0;
 Ponto CantoEsquerdo = Ponto(-20,-1,-10);
+
+///////////////////////////////////////TEXTURA
+GLuint textureId[2];
+void initTexture (void)
+{
+    textureId[0] = LoadTexture ("Falcao.jpg");
+
+}
+
+
 
 // **********************************************************************
 //  void init(void)
@@ -132,6 +147,7 @@ void init(void)
         }
     }
 
+    initTexture();
 
 }
 // **********************************************************************
@@ -168,68 +184,25 @@ void animate()
     }
     if (TempoTotal > 5.0)
     {
-        cout << "Tempo Acumulado: "  << TempoTotal << " segundos. " ;
-        cout << "Nros de Frames sem desenho: " << nFrames << endl;
-        cout << "FPS(sem desenho): " << nFrames/TempoTotal << endl;
+        //cout << "Tempo Acumulado: "  << TempoTotal << " segundos. " ;
+       // cout << "Nros de Frames sem desenho: " << nFrames << endl;
+        //cout << "FPS(sem desenho): " << nFrames/TempoTotal << endl;
+        cout << "SCORE: " << pontuacao << endl;
+
         TempoTotal = 0;
         nFrames = 0;
     }
 }
-
-
-// **********************************************************************
-//  void DesenhaCubo()
-// **********************************************************************
-void DesenhaCubo(float tamAresta)
-{
-    glBegin ( GL_QUADS );
-    // Front Face
-    glNormal3f(0,0,1);
-    glVertex3f(-tamAresta/2, -tamAresta/2,  tamAresta/2);
-    glVertex3f( tamAresta/2, -tamAresta/2,  tamAresta/2);
-    glVertex3f( tamAresta/2,  tamAresta/2,  tamAresta/2);
-    glVertex3f(-tamAresta/2,  tamAresta/2,  tamAresta/2);
-    // Back Face
-    glNormal3f(0,0,-1);
-    glVertex3f(-tamAresta/2, -tamAresta/2, -tamAresta/2);
-    glVertex3f(-tamAresta/2,  tamAresta/2, -tamAresta/2);
-    glVertex3f( tamAresta/2,  tamAresta/2, -tamAresta/2);
-    glVertex3f( tamAresta/2, -tamAresta/2, -tamAresta/2);
-    // Top Face
-    glNormal3f(0,1,0);
-    glVertex3f(-tamAresta/2,  tamAresta/2, -tamAresta/2);
-    glVertex3f(-tamAresta/2,  tamAresta/2,  tamAresta/2);
-    glVertex3f( tamAresta/2,  tamAresta/2,  tamAresta/2);
-    glVertex3f( tamAresta/2,  tamAresta/2, -tamAresta/2);
-    // Bottom Face
-    glNormal3f(0,-1,0);
-    glVertex3f(-tamAresta/2, -tamAresta/2, -tamAresta/2);
-    glVertex3f( tamAresta/2, -tamAresta/2, -tamAresta/2);
-    glVertex3f( tamAresta/2, -tamAresta/2,  tamAresta/2);
-    glVertex3f(-tamAresta/2, -tamAresta/2,  tamAresta/2);
-    // Right face
-    glNormal3f(1,0,0);
-    glVertex3f( tamAresta/2, -tamAresta/2, -tamAresta/2);
-    glVertex3f( tamAresta/2,  tamAresta/2, -tamAresta/2);
-    glVertex3f( tamAresta/2,  tamAresta/2,  tamAresta/2);
-    glVertex3f( tamAresta/2, -tamAresta/2,  tamAresta/2);
-    // Left Face
-    glNormal3f(-1,0,0);
-    glVertex3f(-tamAresta/2, -tamAresta/2, -tamAresta/2);
-    glVertex3f(-tamAresta/2, -tamAresta/2,  tamAresta/2);
-    glVertex3f(-tamAresta/2,  tamAresta/2,  tamAresta/2);
-    glVertex3f(-tamAresta/2,  tamAresta/2, -tamAresta/2);
-    glEnd();
-
-}
-void DesenhaParalelepipedo()
-{
-    glPushMatrix();
-        glTranslatef(5,1,1);
-        glScalef(2,1,2);
-        glutSolidCube(1);
-        //DesenhaCubo(1);
-    glPopMatrix();
+void Pontuar(int objeto){
+    if(objeto == 0) // parede
+    {
+        pontuacao += 5;
+        cout << "Destruiu uma parede: +5" << endl;
+    }
+    if(objeto == 1){//chao
+        pontuacao -=10;
+        cout << "Errou todo mundo: -10" << endl;
+    }
 }
 void DesenhaCanhao()
 {
@@ -243,7 +216,7 @@ void DesenhaCanhao()
     //desenha
     glPushMatrix();
     //Desenha a base
-    glColor3f(100,0,255);
+    glColor3f(1,0,1);
     glScalef(3,1,2);
     glutSolidCube(1);
     glPopMatrix();
@@ -256,7 +229,7 @@ void DesenhaCanhao()
     //Aplica a rotacao de canhao necessaria
     glRotatef(rotacaoCanhao,0,0,1);
     //desenha o cano
-    glColor3f(0,100,255);
+    glColor3f(0,1,1);
     glScalef(1,0.5,0.5);
     glutSolidCube(1);
     glPopMatrix();
@@ -267,17 +240,17 @@ void DesenhaCanhao()
     //vai na posicao atual do projetil
     glTranslatef(0,0.75,0);
     //desenha o projetil
-    glColor3f(255, 0, 0);
+    glColor3f(1, 0, 0);
     glutSolidSphere(0.2, 20, 20);
     glPopMatrix();
 
     //FIM DO VEICULO
+    glColor3f(1,1,1);
     glPopMatrix();
 
 }
-void Atirar(Ponto a, Ponto b, Ponto c,double distancia) //atualiza a posicao do projetil no trajeto
+void Atirar(Ponto a, Ponto b, Ponto c) //atualiza a posicao do projetil no trajeto
 {
-
    if(caminhoProjetil<1){
     //vetor B-A
     Ponto vetorBA = b;
@@ -292,19 +265,17 @@ void Atirar(Ponto a, Ponto b, Ponto c,double distancia) //atualiza a posicao do 
 
     posProjetil = b;
     posProjetil.soma(vetorBC.x*(caminhoProjetil-1.0),vetorBC.y*(caminhoProjetil-1.0),vetorBC.z*(caminhoProjetil-1.0));
+
    }
 
-    glPushMatrix();
-    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
-    glColor3f(100, 0, 0);
-    //glutSolidSphere(0.2, 20, 20);
-    glPopMatrix();
+    caminhoProjetil += (velocidadeProjetil/10);
 
 
-    caminhoProjetil += (velocidadeProjetil/distancia);
 
-    if(caminhoProjetil>2){tiroVivo = false;caminhoProjetil=0;posProjetil = Ponto(0,0,0);}
+
+    if(caminhoProjetil>2.2){tiroVivo = false;caminhoProjetil=0;posProjetil = Ponto(0,0,0);Pontuar(1);}
     posProjetil.soma(posVeiculo.x,posVeiculo.y,posVeiculo.z);
+
 
 }
 
@@ -334,7 +305,7 @@ void Mira()
     //std::cout << "Distancia: " <<distancia << std::endl;
 
     if(tiroVivo){
-        Atirar(PosicaoDoCanhao,B,C,distancia);
+        Atirar(PosicaoDoCanhao,B,C);
 
     }
 
@@ -357,35 +328,7 @@ void Mira()
     glVertex3f(C.x, C.y, C.z);
     glEnd();
 
-
-    //PROJETIL
-    glPushMatrix();
-    //vai na posicao atual do projetil
-    glTranslatef(PosicaoDoCanhao.x,PosicaoDoCanhao.y,PosicaoDoCanhao.z);
-    //desenha o projetil
-    glColor3f(100, 0, 0);
-    //glutSolidSphere(0.5, 20, 20);
-    glPopMatrix();
-
-    //PROJETIL
-    glPushMatrix();
-    //vai na posicao atual do projetil
-    glTranslatef(B.x,B.y,B.z);
-    //desenha o projetil
-    glColor3f(100, 0, 0);
-    //glutSolidSphere(0.5, 20, 20);
-    glPopMatrix();
-
-    //PROJETIL
-    glPushMatrix();
-    //vai na posicao atual do projetil
-    glTranslatef(C.x,C.y,C.z);
-    //desenha o projetil
-    glColor3f(100, 0, 0);
-    //glutSolidSphere(0.5, 20, 20);
-    glPopMatrix();
-
-
+glColor3f(1, 1, 1);
 glPopMatrix();
 
 
@@ -400,6 +343,7 @@ void TestarColisao()
     if(matrizParede[um][dois] == true){ //se ainda nao foi destruido
         um = um - 1;
         dois = dois - 1;
+        Pontuar(0);
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -410,9 +354,8 @@ void TestarColisao()
             if(linha > -1 && coluna > -1 && linha <15 && coluna <25){
                 matrizParede[linha][coluna] = false;
                 cout << "QUEBROU QUADRADO: "<<endl;
-            } //mais pra baixo
-            //if(linha > 15){break;}//mais pra cima
-            //if(coluna > 25){break;}//mais pra direita
+                Pontuar(0);
+            }
         }
     }
         tiroVivo = false;
@@ -426,29 +369,28 @@ void TestarColisao()
 // Eh possivel definir a cor da borda e do interior do piso
 // O ladrilho tem largula 1, centro no (0,0,0) e est‡ sobre o plano XZ
 // **********************************************************************
-void DesenhaLadrilho(int corBorda, int corDentro)
+void DesenhaLadrilho(int id)
 {
-    defineCor(corDentro);// desenha QUAD preenchido
-    //glColor3f(1,1,1);
-    glBegin ( GL_QUADS );
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture (GL_TEXTURE_2D, textureId[id]);
+
+        glBegin ( GL_QUADS );
         glNormal3f(0,1,0);
+        //(0.0)
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3f(-0.5f,  0.0f, -0.5f);
+        //(1.0)
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3f(-0.5f,  0.0f,  0.5f);
+        //(1.1)
+        glTexCoord2f(1.0f, 1.0f);
         glVertex3f( 0.5f,  0.0f,  0.5f);
+        //(0.1)
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3f( 0.5f,  0.0f, -0.5f);
-    glEnd();
 
-    defineCor(corBorda);
-    glColor3f(0,1,0);
-
-    glBegin ( GL_LINE_STRIP );
-        glNormal3f(0,1,0);
-        glVertex3f(-0.5f,  0.0f, -0.5f);
-        glVertex3f(-0.5f,  0.0f,  0.5f);
-        glVertex3f( 0.5f,  0.0f,  0.5f);
-        glVertex3f( 0.5f,  0.0f, -0.5f);
-    glEnd();
-
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
 
 }
 
@@ -469,7 +411,7 @@ void DesenhaPiso()
         for(int z=0; z<25;z++)
         {
             if(matrizPiso[x][z] == true){
-                DesenhaLadrilho(MediumGoldenrod, PaleGreen);
+                DesenhaLadrilho(0);
                 glTranslated(0, 0, 1);
             }
         }
@@ -490,12 +432,13 @@ void DesenhaParede()
         for(int z=0; z<25;z++)
         {
             if(matrizParede[x][z] == true){
-                DesenhaLadrilho(MediumGoldenrod, MediumVioletRed);
+                DesenhaLadrilho(0);
             }
             else{
                 glPushMatrix();
                 glColor3f(0, 0, 200);
                 glutSolidSphere(0.1, 20, 20);
+                glColor3f(1, 1, 1);
                 glPopMatrix();
             }
             glTranslated(0, 0, 1);
@@ -635,29 +578,12 @@ void display( void )
 
 	glMatrixMode(GL_MODELVIEW);
 
-	//Cubo1 - MARCA 0,0,0
-	glPushMatrix();
-		glTranslatef ( 0.0f, 0.0f, 0.0f );
-        glRotatef(angulo,0,1,0);
-		glColor3f(0.5f,0.0f,0.0f); // Vermelho
-        glutSolidCube(0.3);
-	glPopMatrix();
-
-    //Cubo 2 - MARCA O MEIO 13-25
-	glPushMatrix();
-		glTranslatef ( 25.0f, 0.0f, 13.0f );
-		glRotatef(angulo,0,1,0);
-		glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
-        glutSolidCube(2);
-		//DesenhaCubo(1);
-	glPopMatrix();
-
-	;
 	//Testa colisao contra parede tem que tar na linha 25, e até 15 de altura
 	if(posProjetil.x > 24 && posProjetil.x < 25 && posProjetil.y<15)
     {
         cout << "TESTANDO COLISAO NO: "<<posProjetil.x<<", "<<posProjetil.y<<", "<<posProjetil.z<<endl;
         TestarColisao();
+
     }
 
 	//Chão
@@ -670,21 +596,33 @@ void display( void )
     DesenhaCanhao();
 
 
-    //Testa se tem colisao com a parede
+    //Se a mira ta ativa, imprime a mira e mostra o projetil
     if(miraViva)
     {
         Mira();
-         //PROJETIL
-    glPushMatrix();
-    //vai na posicao atual do projetil
-    glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
-    //desenha o projetil
-    glColor3f(0, 0, 255);
-    glutSolidSphere(0.2,20, 20);
-    glPopMatrix();
+        //DESENHA O PROJETIL EM SEU CAMINHO
+        glPushMatrix();
+        glTranslatef(posProjetil.x,posProjetil.y,posProjetil.z);
+        glColor3f(0, 0, 1);
+        glutSolidSphere(0.2,20, 20);
+        glColor3f(1, 1, 1);
+        glPopMatrix();
+
+        //Testa a propria destruicao
+        if(caminhoProjetil>1 &&
+           posProjetil.x<(posVeiculo.x+1.5)&&posProjetil.x>(posVeiculo.x-1.5)&&
+           posProjetil.y<(posVeiculo.y+2)&&posProjetil.y>(posVeiculo.y-0.5)&&
+           posProjetil.z<(posVeiculo.z+1)&&posProjetil.z>(posVeiculo.z-1))
+        {
+            cout << "Voce se destruiu"<<endl;
+            exit(0);
+        }
 
     }
+
+
 	glutSwapBuffers();
+
 }
 // **********************************************************************
 //  void keyboard ( unsigned char key, int x, int y )
@@ -854,6 +792,7 @@ void arrow_keys ( int a_keys, int x, int y )
 			break;
 	}
 }
+
 
 // **********************************************************************
 //  void main ( int argc, char** argv )

@@ -66,6 +66,8 @@
 		<Unit filename="GL/freeglut_ext.h" />
 		<Unit filename="GL/freeglut_std.h" />
 		<Unit filename="GL/glut.h" />
+		<Unit filename="ImageClass.cpp" />
+		<Unit filename="ImageClass.h" />
 		<Unit filename="Linha.o" />
 		<Unit filename="ListaDeCoresRGB.cpp" />
 		<Unit filename="ListaDeCoresRGB.h" />
@@ -74,8 +76,14 @@
 		<Unit filename="Ponto.cpp" />
 		<Unit filename="Ponto.h" />
 		<Unit filename="ProgramaBasico3D.cpp" />
+		<Unit filename="SOIL/SOIL.cpp" />
+		<Unit filename="SOIL/image_DXT.cpp" />
+		<Unit filename="SOIL/image_helper.cpp" />
+		<Unit filename="SOIL/stb_image_aug.cpp" />
 		<Unit filename="Temporizador.cpp" />
 		<Unit filename="Temporizador.h" />
+		<Unit filename="TextureClass.cpp" />
+		<Unit filename="TextureClass.h" />
 		<Unit filename="include/GL/freeglut.h" />
 		<Unit filename="include/GL/freeglut_ext.h" />
 		<Unit filename="include/GL/freeglut_std.h" />
